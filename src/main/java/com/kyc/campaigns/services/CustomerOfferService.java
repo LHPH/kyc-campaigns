@@ -5,16 +5,9 @@ import com.kyc.core.model.web.ResponseData;
 import org.springframework.stereotype.Service;
 
 @Service
-public class CampaignService {
+public class CustomerOfferService {
 
-
-    public ResponseData<Void> confirmCampaign(RequestData<String> req){
+    public ResponseData<Void> getOffers(RequestData<Void> req){
         return null;
     }
-
-    public ResponseData<Void> getCampaign(RequestData<Void> req){
-        return null;
-    }
-
-
 }

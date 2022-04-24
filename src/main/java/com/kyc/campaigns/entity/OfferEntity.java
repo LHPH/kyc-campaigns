@@ -19,7 +19,7 @@ import javax.persistence.Table;
 public class OfferEntity extends BaseOfferEntity{
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "SEQ_KYC_OFFERS")
+   // @GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "SEQ_KYC_OFFERS")
     private Integer id;
 
     @OneToOne
