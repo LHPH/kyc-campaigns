@@ -36,11 +36,11 @@ public class CampaignEntity {
 
     @Column(name = "START_CAMPAIGN_DATE")
     @Temporal(TemporalType.DATE)
-    private Date startCampaignDate;
+    private Date campaignStartDate;
 
     @Column(name = "END_CAMPAIGN_DATE")
     @Temporal(TemporalType.DATE)
-    private Date endCampaignDate;
+    private Date campaignFinishDate;
 
     @Column(name = "ACTIVE")
     private Boolean active;

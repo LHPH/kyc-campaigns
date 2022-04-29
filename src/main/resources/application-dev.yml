@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:6000/kyc_database?reWriteBatchedInserts=true
+    url: jdbc:postgresql://localhost:6000/kyc_database?escapeSyntaxCallMode=callIfNoReturn&reWriteBatchedInserts=true
     username: kyc_user
     password: kyc_pass
     hikari:
@@ -11,7 +11,7 @@ spring:
         jdbc:
           batch_size: 10
         order_inserts: true
-        generate_statistics: true
+        generate_statistics: false
     show-sql: true
     database-platform: org.hibernate.dialect.PostgreSQL9Dialect
 

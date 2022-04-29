@@ -31,6 +31,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -137,6 +138,7 @@ public class PreCampaignService {
                     Cell cellTermAndConditions = row.getCell(9);
                     record.setTermAndConditionsLink(getValue(cellTermAndConditions,Cell::getStringCellValue));
 
+                    record.setProcessed(false);
                     preOffers.add(record);
 
                 }
@@ -155,7 +157,14 @@ public class PreCampaignService {
         }
     }
 
-    public void cleanPreOffers(){
-        
+    @Transactional
+    public ResponseData<Boolean> cleanPreOffers(){
+
+        Map<String,Object> result = offerTemporalRepository.cleanTempOffers(5);
+        LOGGER.info("{}",result);
+        if(result.get("P_ERROR_CODE")==null){
+            return ResponseData.of(true);
+        }
+        return ResponseData.of(false);
     }
 }

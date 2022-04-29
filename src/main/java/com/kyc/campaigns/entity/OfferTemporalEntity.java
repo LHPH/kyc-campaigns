@@ -8,15 +8,26 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
+import javax.persistence.NamedStoredProcedureQueries;
+import javax.persistence.NamedStoredProcedureQuery;
+import javax.persistence.ParameterMode;
 import javax.persistence.SequenceGenerator;
+import javax.persistence.StoredProcedureParameter;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-import java.util.Date;
 
 @Entity
 @Table(name = "KYC_TEMP_OFFERS")
+@NamedStoredProcedureQueries(
+        @NamedStoredProcedureQuery(
+                name = "SP_CLEAN_KYC_TEMP_OFFERS",
+                procedureName = "SP_CLEAN_KYC_TEMP_OFFERS",
+                parameters = {
+                        @StoredProcedureParameter(mode = ParameterMode.IN,name = "P_CHUNK_SIZE",type = Integer.class),
+                        @StoredProcedureParameter(mode = ParameterMode.INOUT,name = "P_ERROR_CODE",type = String.class),
+                        @StoredProcedureParameter(mode = ParameterMode.INOUT,name = "P_ERROR_DETAIL",type = String.class),
+                        @StoredProcedureParameter(mode = ParameterMode.INOUT,name = "P_DELETED_ROWS",type = Integer.class)
+                })
+)
 @Setter
 @Getter
 public class OfferTemporalEntity extends BaseOfferEntity{
@@ -32,5 +43,8 @@ public class OfferTemporalEntity extends BaseOfferEntity{
 
     @Column(name = "KEY_PRE_CAMPAIGN")
     private String keyPreCampaign;
+
+    @Column(name = "PROCESSED")
+    private Boolean processed;
 
 }

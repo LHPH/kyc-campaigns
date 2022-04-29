@@ -1,20 +1,129 @@
 package com.kyc.campaigns.services;
 
+import com.kyc.campaigns.entity.CampaignEntity;
+import com.kyc.campaigns.entity.ErrorOffersEntity;
+import com.kyc.campaigns.entity.OfferTemporalEntity;
+import com.kyc.campaigns.mappers.CampaignMapper;
+import com.kyc.campaigns.model.CampaignData;
+import com.kyc.campaigns.model.CampaignOfferData;
+import com.kyc.campaigns.repositories.CampaignRepository;
+import com.kyc.campaigns.repositories.ErrorOffersRepository;
+import com.kyc.campaigns.repositories.OfferRepository;
+import com.kyc.campaigns.repositories.OfferTemporalRepository;
+import com.kyc.core.exception.KycRestException;
+import com.kyc.core.model.web.MessageData;
 import com.kyc.core.model.web.RequestData;
 import com.kyc.core.model.web.ResponseData;
+import com.kyc.core.properties.KycMessages;
+import org.apache.commons.lang3.math.NumberUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class CampaignService {
 
+    @Autowired
+    private CampaignRepository campaignRepository;
 
-    public ResponseData<Void> confirmCampaign(RequestData<String> req){
-        return null;
+    @Autowired
+    private OfferRepository offerRepository;
+
+    @Autowired
+    private CampaignMapper campaignMapper;
+
+    @Autowired
+    private OfferTemporalRepository offerTemporalRepository;
+
+    @Autowired
+    private ErrorOffersRepository errorOffersRepository;
+
+    @Autowired
+    private KycMessages kycMessages;
+
+    public ResponseData<Boolean> confirmCampaign(RequestData<CampaignData> req){
+
+        CampaignData campaignData = req.getBody();
+        Map<String,Object> pathParams = req.getPathParams();
+        String keyPreCampaign = pathParams.get("key").toString();
+
+        Optional<OfferTemporalEntity> opOffersTemporal = offerTemporalRepository.findByKeyPreCampaign(keyPreCampaign);
+        if(opOffersTemporal.isPresent()){
+
+            List<ErrorOffersEntity> errors = errorOffersRepository.getErrors(keyPreCampaign);
+            if(errors.isEmpty()){
+
+
+                campaignRepository.addNewCampaign(5);
+                return ResponseData.of(true);
+            }
+            MessageData messageData = kycMessages.getMessage("001");
+            throw KycRestException.builderRestException()
+                    .errorData(messageData)
+                    .status(HttpStatus.UNPROCESSABLE_ENTITY)
+                    .inputData(req)
+                    .build();
+        }
+        MessageData messageData = kycMessages.getMessage("001");
+        throw KycRestException.builderRestException()
+                .errorData(messageData)
+                .status(HttpStatus.UNPROCESSABLE_ENTITY)
+                .inputData(req)
+                .build();
     }
 
-    public ResponseData<Void> getCampaign(RequestData<Void> req){
-        return null;
+    public ResponseData<List<CampaignData>> getCampaigns(RequestData<Void> req){
+
+        Map<String,String> queryParams = req.getQueryParams();
+        Integer campaignId = NumberUtils.toInt(queryParams.get("campaignId"),0);
+        List<CampaignData> campaigns;
+
+        if(campaignId!=0){
+
+            Optional<CampaignEntity> opCampaign = campaignRepository.findById(campaignId);
+            campaigns = new ArrayList<>();
+            opCampaign.ifPresent(campaignEntity -> campaigns.add(campaignMapper.toCampaignData(campaignEntity)));
+        }
+        else{
+            List<CampaignEntity> list = campaignRepository.findAll();
+
+            campaigns = list.stream()
+                    .map(e -> campaignMapper.toCampaignData(e))
+                    .collect(Collectors.toList());
+        }
+        return ResponseData.of(campaigns);
     }
 
+    @Transactional
+    public ResponseData<Boolean> activateCampaign(RequestData<Void> req){
+
+        Map<String,Object> pathParams = req.getPathParams();
+        Map<String,String> queryParams = req.getQueryParams();
+
+        Integer id = Integer.parseInt(pathParams.get("id").toString());
+        Boolean status = Boolean.parseBoolean(queryParams.get("active"));
+
+        if(Boolean.TRUE.equals(status)){
+
+            campaignRepository.updateStatusCampaign(id,true);
+            offerRepository.updateStatusCampaignOffers(id,2);
+        }
+        else{
+            campaignRepository.updateStatusCampaign(id,false);
+        }
+        return ResponseData.of(true);
+    }
+
+    public ResponseData<CampaignOfferData> getOffersByCampaign(RequestData<Void> req){
+
+        return null;
+    }
 
 }
