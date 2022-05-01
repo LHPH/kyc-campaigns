@@ -10,7 +10,7 @@ import java.util.Optional;
 
 public interface OfferTemporalRepository extends JpaRepository<OfferTemporalEntity,Integer> {
 
-    Optional<OfferTemporalEntity> findByKeyPreCampaign(String keyPreCampaign);
+    Optional<OfferTemporalEntity> findFirstPreOfferByKeyPreCampaign(String keyPreCampaign);
 
     @Procedure(name = "SP_CLEAN_KYC_TEMP_OFFERS")
     Map<String,Object> cleanTempOffers(@Param("P_CHUNK_SIZE") Integer chunkSize);

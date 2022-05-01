@@ -15,13 +15,16 @@ import com.kyc.core.model.web.MessageData;
 import com.kyc.core.model.web.RequestData;
 import com.kyc.core.model.web.ResponseData;
 import com.kyc.core.properties.KycMessages;
+import com.kyc.core.util.DateUtil;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -54,14 +57,17 @@ public class CampaignService {
         Map<String,Object> pathParams = req.getPathParams();
         String keyPreCampaign = pathParams.get("key").toString();
 
-        Optional<OfferTemporalEntity> opOffersTemporal = offerTemporalRepository.findByKeyPreCampaign(keyPreCampaign);
+        Optional<OfferTemporalEntity> opOffersTemporal = offerTemporalRepository.findFirstPreOfferByKeyPreCampaign(keyPreCampaign);
         if(opOffersTemporal.isPresent()){
 
             List<ErrorOffersEntity> errors = errorOffersRepository.getErrors(keyPreCampaign);
             if(errors.isEmpty()){
 
+                String campaignName = campaignData.getName();
+                Date startDate = DateUtil.stringToDate(campaignData.getStartDate(),"yyyy-MM-dd");
+                Date endDate = DateUtil.stringToDate(campaignData.getFinishDate(),"yyyy-MM-dd");
 
-                campaignRepository.addNewCampaign(5);
+                campaignRepository.createNewKycCampaign(keyPreCampaign,campaignName,startDate,endDate,5);
                 return ResponseData.of(true);
             }
             MessageData messageData = kycMessages.getMessage("001");
@@ -123,7 +129,27 @@ public class CampaignService {
 
     public ResponseData<CampaignOfferData> getOffersByCampaign(RequestData<Void> req){
 
-        return null;
+        try{
+
+            Map<String,Object> pathParams = req.getPathParams();
+            Integer campaignId = NumberUtils.toInt(pathParams.get("id").toString(),0);
+
+            Optional<CampaignEntity> opCampaign = campaignRepository.getOffersByCampaign(campaignId);
+            if(opCampaign.isPresent()){
+
+                CampaignOfferData result = campaignMapper.toCampaignOfferData(opCampaign.get());
+                return ResponseData.of(result);
+            }
+            return ResponseData.of(null,HttpStatus.NO_CONTENT);
+        }
+        catch(DataAccessException ex){
+            MessageData messageData = kycMessages.getMessage("001");
+            throw KycRestException.builderRestException()
+                    .errorData(messageData)
+                    .status(HttpStatus.SERVICE_UNAVAILABLE)
+                    .inputData(req)
+                    .build();
+        }
     }
 
 }
