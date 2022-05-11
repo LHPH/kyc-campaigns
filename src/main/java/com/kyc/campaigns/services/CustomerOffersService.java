@@ -15,11 +15,12 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import javax.xml.crypto.Data;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static com.kyc.campaigns.constants.AppConstants.MSG_CODE_003;
 
 @Service
 public class CustomerOffersService {
@@ -49,7 +50,7 @@ public class CustomerOffersService {
        }
        catch(DataAccessException ex){
 
-           MessageData messageData = kycMessages.getMessage("001");
+           MessageData messageData = kycMessages.getMessage(MSG_CODE_003);
            throw KycRestException.builderRestException()
                    .errorData(messageData)
                    .status(HttpStatus.SERVICE_UNAVAILABLE)
@@ -77,7 +78,7 @@ public class CustomerOffersService {
         }
         catch(DataAccessException ex){
 
-            MessageData messageData = kycMessages.getMessage("001");
+            MessageData messageData = kycMessages.getMessage(MSG_CODE_003);
             throw KycRestException.builderRestException()
                     .errorData(messageData)
                     .status(HttpStatus.SERVICE_UNAVAILABLE)

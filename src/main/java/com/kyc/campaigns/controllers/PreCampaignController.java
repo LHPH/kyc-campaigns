@@ -19,7 +19,7 @@ public class PreCampaignController {
     @Autowired
     private PreCampaignDelegate delegate;
 
-    @PostMapping("/")
+    @PostMapping
     public ResponseEntity<ResponseData<ResultPreLoadOffers>> uploadPreOffers(@RequestParam("file") MultipartFile file){
 
         RequestData<MultipartFile> req = RequestData.<MultipartFile>builder()

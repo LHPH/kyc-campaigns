@@ -7,13 +7,16 @@ import com.kyc.campaigns.model.ErrorPreOfferDetail;
 import com.kyc.campaigns.model.ResultPreLoadOffers;
 import com.kyc.campaigns.repositories.ErrorOffersRepository;
 import com.kyc.campaigns.repositories.OfferTemporalRepository;
+import com.kyc.campaigns.util.CellUtil;
 import com.kyc.core.exception.KycRestException;
 import com.kyc.core.model.web.MessageData;
 import com.kyc.core.model.web.RequestData;
 import com.kyc.core.model.web.ResponseData;
 import com.kyc.core.properties.KycMessages;
 import com.kyc.core.util.DateUtil;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -21,6 +24,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,6 +39,9 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import static com.kyc.campaigns.constants.AppConstants.MSG_CODE_002;
+import static com.kyc.campaigns.constants.AppConstants.MSG_CODE_003;
+import static com.kyc.campaigns.constants.AppConstants.MSG_CODE_006;
 import static com.kyc.core.util.GeneralUtil.getValue;
 import static com.kyc.core.util.GeneralUtil.toInt;
 
@@ -68,21 +75,35 @@ public class PreCampaignService {
         response.setKeyPreCampaign(keyPreCampaign);
         if(!preOffers.isEmpty()){
 
-            //https://stackoverflow.com/questions/70569706/hibernate-postgresql-batch-insert-no-longer-working-after-upgrade
-            offerTemporalRepository.saveAll(preOffers);
+           try{
 
-            List<ErrorOffersEntity> errors = errorOffersRepository.getErrors(keyPreCampaign);
-            List<ErrorPreOfferDetail> listErrors = errors
-                    .stream()
-                    .map(e -> errorDetailMapper.mapperToModel(e))
-                    .collect(Collectors.toList());
+               offerTemporalRepository.saveAll(preOffers);
 
-            response.setSuccessfullyLoadedPreOffers(preOffers.size()-listErrors.size());
-            response.setUnsuccessfullyLoadedPreOffers(errors.size());
-            response.setErrorPreOffers(listErrors);
+               List<ErrorOffersEntity> errors = errorOffersRepository.getErrors(keyPreCampaign);
+               List<ErrorPreOfferDetail> listErrors = errors
+                       .stream()
+                       .map(e -> errorDetailMapper.mapperToModel(e))
+                       .collect(Collectors.toList());
+
+               response.setSuccessfullyLoadedPreOffers(preOffers.size()-listErrors.size());
+               response.setUnsuccessfullyLoadedPreOffers(errors.size());
+               response.setErrorPreOffers(listErrors);
+               return ResponseData.of(response);
+           }
+           catch(DataAccessException ex){
+               MessageData messageData = kycMessages.getMessage(MSG_CODE_003);
+               throw KycRestException.builderRestException()
+                       .errorData(messageData)
+                       .status(HttpStatus.SERVICE_UNAVAILABLE)
+                       .exception(ex)
+                       .build();
+           }
         }
-        return ResponseData.of(response);
-
+        MessageData messageData = kycMessages.getMessage(MSG_CODE_006);
+        throw KycRestException.builderRestException()
+                .errorData(messageData)
+                .status(HttpStatus.NO_CONTENT)
+                .build();
     }
 
     private List<OfferTemporalEntity> processExcelFile(MultipartFile file, String keyPreCampaign){
@@ -100,42 +121,50 @@ public class PreCampaignService {
                 int rowNum = row.getRowNum();
                 if(rowNum>0){
 
+                    Cell[] cells = CellUtil.getCells(row);
+
+                    if(CellUtil.allNullOrBlankCells(cells)){
+                        continue;
+                    }
+
                     OfferTemporalEntity record = new OfferTemporalEntity();
                     record.setKeyPreCampaign(keyPreCampaign);
                     record.setRecordExcel(--rowNum);
 
-                    Cell cellCustomerNumber = row.getCell(0);
+                    LOGGER.info("Processing row num {}",rowNum);
+
+                    Cell cellCustomerNumber = cells[0];
                     Double customerNumber = getValue(cellCustomerNumber,Cell::getNumericCellValue);
                     record.setCustomerNumber(toInt(customerNumber,null));
 
-                    Cell cellCustomerEmail = row.getCell(1);
+                    Cell cellCustomerEmail =  cells[1];
                     record.setCustomerEmail(getValue(cellCustomerEmail,Cell::getStringCellValue));
 
-                    Cell cellOfferName = row.getCell(2);
+                    Cell cellOfferName =  cells[2];
                     record.setOfferName(getValue(cellOfferName,Cell::getStringCellValue));
 
-                    Cell cellOfferDesc = row.getCell(3);
+                    Cell cellOfferDesc =  cells[3];
                     record.setOfferDescription(getValue(cellOfferDesc,Cell::getStringCellValue));
 
-                    Cell cellPromotionalCode = row.getCell(4);
+                    Cell cellPromotionalCode =  cells[4];
                     record.setPromotionalCode(getValue(cellPromotionalCode,Cell::getStringCellValue));
 
-                    Cell cellDiscount = row.getCell(5);
+                    Cell cellDiscount =  cells[5];
                     Double discount = getValue(cellDiscount,Cell::getNumericCellValue);
                     record.setDiscount(toInt(discount,null));
 
-                    Cell cellReward = row.getCell(6);
+                    Cell cellReward =  cells[6];
                     record.setReward(getValue(cellReward,Cell::getStringCellValue));
 
-                    Cell cellStartDate = row.getCell(7);
+                    Cell cellStartDate = cells[7];
                     String startDate = getValue(cellStartDate,Cell::getStringCellValue);
                     record.setStartDate(DateUtil.stringToDate(startDate,"yyyy-MM-dd"));
 
-                    Cell cellEndDate = row.getCell(8);
+                    Cell cellEndDate =  cells[8];
                     String endDate = getValue(cellEndDate,Cell::getStringCellValue);
                     record.setEndDate(DateUtil.stringToDate(endDate,"yyyy-MM-dd"));
 
-                    Cell cellTermAndConditions = row.getCell(9);
+                    Cell cellTermAndConditions =  cells[9];
                     record.setTermAndConditionsLink(getValue(cellTermAndConditions,Cell::getStringCellValue));
 
                     record.setProcessed(false);
@@ -147,7 +176,7 @@ public class PreCampaignService {
            return preOffers;
         }
         catch(IOException ioex){
-            MessageData messageData = kycMessages.getMessage("001");
+            MessageData messageData = kycMessages.getMessage(MSG_CODE_002);
             throw KycRestException.builderRestException()
                     .errorData(messageData)
                     .status(HttpStatus.UNPROCESSABLE_ENTITY)
@@ -165,6 +194,11 @@ public class PreCampaignService {
         if(result.get("P_ERROR_CODE")==null){
             return ResponseData.of(true);
         }
-        return ResponseData.of(false);
+        MessageData messageData = kycMessages.getMessage(MSG_CODE_003);
+        throw KycRestException.builderRestException()
+                .errorData(messageData)
+                .status(HttpStatus.SERVICE_UNAVAILABLE)
+                .outputData(result)
+                .build();
     }
 }

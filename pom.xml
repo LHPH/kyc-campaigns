@@ -136,6 +136,7 @@
 						<exclude>com/kyc/campaigns/repositories/**</exclude>
 						<exclude>com/kyc/campaigns/model/**/*</exclude>
 						<exclude>com/kyc/campaigns/entity/**/*</exclude>
+						<exclude>com/kyc/campaigns/mappers/**/*</exclude>
 					</excludes>
 				</configuration>
 				<executions>
