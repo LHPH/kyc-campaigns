@@ -2,7 +2,6 @@ package com.kyc.campaigns.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kyc.campaigns.delegate.CustomerOffersDelegate;
-import com.kyc.campaigns.model.CampaignOfferData;
 import com.kyc.campaigns.model.OfferData;
 import com.kyc.core.model.web.RequestData;
 import com.kyc.core.model.web.ResponseData;

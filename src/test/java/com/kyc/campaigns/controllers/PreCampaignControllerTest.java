@@ -2,7 +2,6 @@ package com.kyc.campaigns.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kyc.campaigns.delegate.PreCampaignDelegate;
-import com.kyc.campaigns.model.OfferData;
 import com.kyc.campaigns.model.ResultPreLoadOffers;
 import com.kyc.core.model.web.RequestData;
 import com.kyc.core.model.web.ResponseData;
@@ -20,11 +19,8 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.List;
-
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;

@@ -2,7 +2,6 @@ package com.kyc.campaigns.entity;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.GeneratorType;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

@@ -2,15 +2,12 @@ package com.kyc.campaigns.delegate;
 
 import com.kyc.campaigns.model.CampaignData;
 import com.kyc.campaigns.model.CampaignOfferData;
-import com.kyc.campaigns.model.ResultPreLoadOffers;
 import com.kyc.campaigns.services.CampaignService;
-import com.kyc.campaigns.services.PreCampaignService;
 import com.kyc.core.model.web.RequestData;
 import com.kyc.core.model.web.ResponseData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 

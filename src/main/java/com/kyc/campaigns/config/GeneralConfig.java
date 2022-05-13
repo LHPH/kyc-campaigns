@@ -1,6 +1,5 @@
 package com.kyc.campaigns.config;
 
-import com.kyc.core.config.BuildDetailConfig;
 import com.kyc.core.exception.handlers.KycGenericRestExceptionHandler;
 import com.kyc.core.exception.handlers.KycUnhandledExceptionHandler;
 import com.kyc.core.exception.handlers.KycValidationRestExceptionHandler;
