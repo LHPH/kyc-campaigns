@@ -5,7 +5,7 @@ import com.kyc.campaigns.mappers.OfferMapper;
 import com.kyc.campaigns.model.OfferData;
 import com.kyc.campaigns.repositories.OfferRepository;
 import com.kyc.core.exception.KycRestException;
-import com.kyc.core.model.web.MessageData;
+import com.kyc.core.model.MessageData;
 import com.kyc.core.model.web.RequestData;
 import com.kyc.core.model.web.ResponseData;
 import com.kyc.core.properties.KycMessages;
