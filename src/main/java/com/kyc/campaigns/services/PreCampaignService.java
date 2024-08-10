@@ -75,7 +75,7 @@ public class PreCampaignService {
 
            try{
 
-               offerTemporalRepository.saveAll(preOffers);
+               //offerTemporalRepository.saveAll(preOffers);
 
                List<ErrorOffersEntity> errors = errorOffersRepository.getErrors(keyPreCampaign);
                List<ErrorPreOfferDetail> listErrors = errors

@@ -1,19 +1,18 @@
 package com.kyc.campaigns.entity;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.NamedStoredProcedureQueries;
+import jakarta.persistence.NamedStoredProcedureQuery;
+import jakarta.persistence.ParameterMode;
+import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.StoredProcedureParameter;
+import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.NamedStoredProcedureQueries;
-import javax.persistence.NamedStoredProcedureQuery;
-import javax.persistence.ParameterMode;
-import javax.persistence.SequenceGenerator;
-import javax.persistence.StoredProcedureParameter;
-import javax.persistence.Table;
 
 @Entity
 @Table(name = "KYC_TEMP_OFFERS")
