@@ -31,9 +31,11 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -75,17 +77,25 @@ public class PreCampaignService {
 
            try{
 
-               //offerTemporalRepository.saveAll(preOffers);
+               offerTemporalRepository.saveAll(preOffers);
 
                List<ErrorOffersEntity> errors = errorOffersRepository.getErrors(keyPreCampaign);
+               Set<Integer> recordWithErrors = new HashSet<>();
                List<ErrorPreOfferDetail> listErrors = errors
                        .stream()
-                       .map(e -> errorDetailMapper.mapperToModel(e))
+                       .map(e -> {
+
+                           ErrorPreOfferDetail model = errorDetailMapper.mapperToModel(e);
+                           recordWithErrors.add(model.getRecord());
+                           return model;
+
+                       })
                        .collect(Collectors.toList());
 
-               response.setSuccessfullyLoadedPreOffers(preOffers.size()-listErrors.size());
-               response.setUnsuccessfullyLoadedPreOffers(errors.size());
+               response.setSuccessfullyLoadedPreOffers(preOffers.size()-recordWithErrors.size());
+               response.setUnsuccessfullyLoadedPreOffers(recordWithErrors.size());
                response.setErrorPreOffers(listErrors);
+
                return ResponseData.of(response);
            }
            catch(DataAccessException ex){
@@ -127,7 +137,7 @@ public class PreCampaignService {
 
                     OfferTemporalEntity record = new OfferTemporalEntity();
                     record.setKeyPreCampaign(keyPreCampaign);
-                    record.setRecordExcel(--rowNum);
+                    record.setRecordExcel(++rowNum);
 
                     LOGGER.info("Processing row num {}",rowNum);
 
