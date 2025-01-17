@@ -21,10 +21,15 @@ import lombok.Setter;
                 name = "SP_CLEAN_KYC_TEMP_OFFERS",
                 procedureName = "SP_CLEAN_KYC_TEMP_OFFERS",
                 parameters = {
+                        /**
+                         * In database the three last parameter are declared as INOUT parameter. Like that, we are
+                         * forced to declare the parameters in the method to execute the procedure so the parameter
+                         * are changed to OUT mode
+                         */
                         @StoredProcedureParameter(mode = ParameterMode.IN,name = "P_CHUNK_SIZE",type = Integer.class),
-                        @StoredProcedureParameter(mode = ParameterMode.INOUT,name = "P_ERROR_CODE",type = String.class),
-                        @StoredProcedureParameter(mode = ParameterMode.INOUT,name = "P_ERROR_DETAIL",type = String.class),
-                        @StoredProcedureParameter(mode = ParameterMode.INOUT,name = "P_DELETED_ROWS",type = Integer.class)
+                        @StoredProcedureParameter(mode = ParameterMode.OUT,name = "P_ERROR_CODE",type = String.class),
+                        @StoredProcedureParameter(mode = ParameterMode.OUT,name = "P_ERROR_DETAIL",type = String.class),
+                        @StoredProcedureParameter(mode = ParameterMode.OUT,name = "P_DELETED_ROWS",type = Integer.class)
                 })
 )
 @Setter
