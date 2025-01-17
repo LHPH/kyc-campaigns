@@ -60,7 +60,7 @@ public class CampaignControllerTest {
 
         when(delegate.confirmCampaign(any(RequestData.class))).thenReturn(response);
 
-        mockMvc.perform(post("/campaigns/{key}","key")
+        mockMvc.perform(post("/campaign/{key}","key")
                 .content(req)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
@@ -74,7 +74,7 @@ public class CampaignControllerTest {
 
         when(delegate.activateCampaign(any(RequestData.class))).thenReturn(response);
 
-        mockMvc.perform(post("/campaigns/activation/{id}",1)
+        mockMvc.perform(post("/campaign/activation/{id}",1)
                 .contentType(MediaType.APPLICATION_JSON).param("active","true"))
                 .andDo(print())
                 .andExpect(status().isOk());
@@ -88,7 +88,7 @@ public class CampaignControllerTest {
 
         when(delegate.getCampaigns(any(RequestData.class))).thenReturn(response);
 
-        mockMvc.perform(get("/campaigns")
+        mockMvc.perform(get("/")
                 .contentType(MediaType.APPLICATION_JSON).param("campaignId","1"))
                 .andDo(print())
                 .andExpect(status().isOk());
@@ -101,7 +101,7 @@ public class CampaignControllerTest {
 
         when(delegate.getOffersByCampaign(any(RequestData.class))).thenReturn(response);
 
-        mockMvc.perform(get("/campaigns/{id}/offers",1)
+        mockMvc.perform(get("/campaign/{id}/offers",1)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk());

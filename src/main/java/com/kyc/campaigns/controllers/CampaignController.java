@@ -20,13 +20,12 @@ import java.util.List;
 import java.util.Objects;
 
 @RestController
-@RequestMapping("/campaigns")
 public class CampaignController {
 
     @Autowired
     private CampaignDelegate delegate;
 
-    @PostMapping("/{key}")
+    @PostMapping("/campaign/{key}")
     public ResponseEntity<ResponseData<Boolean>> confirmCampaign(@PathVariable("key") String key,
                                                    @RequestBody CampaignData data){
 
@@ -37,7 +36,7 @@ public class CampaignController {
         return delegate.confirmCampaign(req);
     }
 
-    @PostMapping("/activation/{id}")
+    @PostMapping("/campaign/activation/{id}")
     public ResponseEntity<ResponseData<Boolean>> activationCampaign(@PathVariable("id") Integer id,
                                                                     @RequestParam("active") Boolean status){
 
@@ -48,7 +47,7 @@ public class CampaignController {
         return delegate.activateCampaign(req);
     }
 
-    @GetMapping
+    @GetMapping("/")
     public ResponseEntity<ResponseData<List<CampaignData>>> getCampaigns(@RequestParam(name = "campaignId",required = false) Integer campaignId){
 
         RequestData<Void> req = RequestData.<Void>builder()
@@ -57,7 +56,7 @@ public class CampaignController {
         return delegate.getCampaigns(req);
     }
 
-    @GetMapping("/{id}/offers")
+    @GetMapping("/campaign/{id}/offers")
     public ResponseEntity<ResponseData<CampaignOfferData>> getOffersByCampaign(@PathVariable("id") Integer id){
 
         RequestData<Void> req = RequestData.<Void>builder()
