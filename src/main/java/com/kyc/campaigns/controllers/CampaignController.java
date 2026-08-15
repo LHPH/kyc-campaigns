@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -26,7 +25,7 @@ public class CampaignController {
     private CampaignDelegate delegate;
 
     @PostMapping("/campaign/{key}")
-    public ResponseEntity<ResponseData<Boolean>> confirmCampaign(@PathVariable("key") String key,
+    public ResponseEntity<ResponseData<Boolean>> confirmCampaign(@PathVariable String key,
                                                    @RequestBody CampaignData data){
 
         RequestData<CampaignData> req = RequestData.<CampaignData>builder()
@@ -37,7 +36,7 @@ public class CampaignController {
     }
 
     @PostMapping("/campaign/activation/{id}")
-    public ResponseEntity<ResponseData<Boolean>> activationCampaign(@PathVariable("id") Integer id,
+    public ResponseEntity<ResponseData<Boolean>> activationCampaign(@PathVariable Integer id,
                                                                     @RequestParam("active") Boolean status){
 
         RequestData<Void> req = RequestData.<Void>builder()
@@ -57,7 +56,7 @@ public class CampaignController {
     }
 
     @GetMapping("/campaign/{id}/offers")
-    public ResponseEntity<ResponseData<CampaignOfferData>> getOffersByCampaign(@PathVariable("id") Integer id){
+    public ResponseEntity<ResponseData<CampaignOfferData>> getOffersByCampaign(@PathVariable Integer id){
 
         RequestData<Void> req = RequestData.<Void>builder()
                 .pathParams(Collections.singletonMap("id",id))
